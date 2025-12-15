@@ -28,8 +28,7 @@ namespace Amuse.UI.Services
         private readonly ILogger<ModeratorService> _logger;
         private readonly AmuseSettings _settings;
         private readonly IDialogService _dialogService;
-        private readonly string _hashContentFilterBin = "92624cc3ebe28e7b95bc36a7b2dcda7c3f8211dad0ff127264a5f53d9f16752f";
-        private readonly string _hashContentFilterOnnx = "eb240e8d2d6f41d53a38caba799c5e7d7ce03db6ed627151ac93b59e75f37106";
+        // Content filter hashes removed - no longer used
         private readonly ClipTokenizer _clipTokenizer;
 
         private string[] _contentFilterWordList;
@@ -44,12 +43,15 @@ namespace Amuse.UI.Services
             _clipTokenizer = CreateCLIPTokenizer();
         }
 
-        public bool IsContentFilterEnabled => _contentFilterModel is not null && !_settings.IsModelEvaluationModeEnabled;
+        public bool IsContentFilterEnabled => false; // Content filtering disabled
         public ContentFilterModelSetViewModel ContentFilterModel => _contentFilterModel;
         public ClipTokenizer ClipTokenizer => _clipTokenizer;
 
-        public async Task<bool> ContainsExplicitContentAsync(string prompt)
+        public Task<bool> ContainsExplicitContentAsync(string prompt)
         {
+            // Content filtering disabled - always return false
+            return Task.FromResult(false);
+            /* Original code disabled
             if (_settings.IsModelEvaluationModeEnabled)
                 return false;
 
@@ -67,6 +69,7 @@ namespace Amuse.UI.Services
                 MessageDialog.MessageBoxStyleType.Warning
             );
             return true;
+            */
         }
 
         private Dictionary<string, int> AnalyzeExplicitContent(string prompt)
@@ -83,6 +86,13 @@ namespace Amuse.UI.Services
 
         private void CreateContentFilter()
         {
+            // Content filtering disabled - skip loading ContentFilter files
+            _logger.LogInformation("[ModeratorService] Content filtering is disabled.");
+            _contentFilterWordList = Array.Empty<string>();
+            _contentFilterModel = null;
+            return;
+
+            /* Original code disabled - will not throw exceptions if files are missing
             var modelPath = Path.Combine(App.PluginDirectory, "ContentFilter", "ContentFilter.onnx");
             if (!File.Exists(modelPath))
                 throw new FileNotFoundException(modelPath);
@@ -105,6 +115,7 @@ namespace Amuse.UI.Services
                     OnnxModelPath = modelPath
                 }
             };
+            */
         }
 
 
